@@ -1,0 +1,6 @@
+xaplus:
+  serverId: "ledger-2"
+  queueSize: 128
+  defaultTimeoutInSeconds: 10
+server:
+  port: 8002
