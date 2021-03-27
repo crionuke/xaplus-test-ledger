@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.crionuke.xaplus" level="TRACE" />
+    <logger name="org.xaplus.engine" level="DEBUG" />
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

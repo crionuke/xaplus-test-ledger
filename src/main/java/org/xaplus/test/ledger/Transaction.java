@@ -1,11 +1,12 @@
-package com.crionuke.xaplus.test.ledger;
+package org.xaplus.test.ledger;
 
-import com.crionuke.xaplus.XAPlusEngine;
-import com.crionuke.xaplus.XAPlusRestServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.xaplus.engine.XAPlusEngine;
+import org.xaplus.engine.XAPlusRestServer;
+import org.xaplus.engine.XAPlusXid;
 
 import javax.transaction.xa.XAException;
 import java.sql.Connection;
@@ -71,38 +72,31 @@ public class Transaction {
         slaveSql.executeUpdate();
     }
 
-    protected void callCredit(XAPlusEngine engine, int userUid, int count) throws XAException {
+    protected XAPlusXid callCredit(XAPlusEngine engine, int userUid, int count)
+            throws XAException, RestClientException {
         logger.debug("CALL credit {} with {}", userUid, count);
         String serviceName = getServiceName(userUid);
-        String xid = engine.enlistXAPlus(serviceName);
+        XAPlusXid xid = engine.createXAPlusXid(serviceName);
         RestTemplate restTemplate = new RestTemplate();
         String url = getServiceLocation(userUid) + "/credit?xid=" + xid + "&userUid=" + userUid + "&count=" + count;
-        try {
-            boolean result = restTemplate.getForObject(url, Boolean.class);
-            if (!result) {
-                logger.warn("Credit request to {} rejected", url);
-            }
-            logger.debug("Call credit {} completed", userUid);
-        } catch (RestClientException rce) {
-            logger.warn("Credit request to {} failed with {}", url, rce.getMessage());
-        }
+        restTemplate.getForObject(url, Boolean.class);
+        logger.debug("Call credit {} completed", userUid);
+        return xid;
     }
 
-    protected void callDebet(XAPlusEngine engine, int userUid, int count) throws XAException {
+    protected XAPlusXid callDebet(XAPlusEngine engine, int userUid, int count)
+            throws XAException, RestClientException {
         logger.debug("Call debet {} with {}", userUid, count);
         String serviceName = getServiceName(userUid);
-        String xid = engine.enlistXAPlus(serviceName);
+        XAPlusXid xid = engine.createXAPlusXid(serviceName);
         RestTemplate restTemplate = new RestTemplate();
         String url = getServiceLocation(userUid) + "/debet?xid=" + xid + "&userUid=" + userUid + "&count=" + count;
-        try {
-            boolean result = restTemplate.getForObject(url, Boolean.class);
-            if (!result) {
-                logger.warn("Credit request to {} rejected", url);
-            }
-            logger.debug("Call debet {} completed", userUid);
-        } catch (RestClientException rce) {
-            logger.warn("Credit request to {} failed with {}", url, rce.getMessage());
+        boolean result = restTemplate.getForObject(url, Boolean.class);
+        if (!result) {
+            logger.warn("Credit request to {} rejected", url);
         }
+        logger.debug("Call debet {} completed", userUid);
+        return xid;
     }
 
     private String getServiceLocation(int userUid) {
@@ -139,11 +133,11 @@ public class Transaction {
             throw new IllegalArgumentException("Wrong userUid=" + userUid);
         }
         if (userUid >= 0 && userUid < 1000) {
-            return "database1";
+            return "database-1";
         } else if (userUid >= 1000 && userUid < 2000) {
-            return "database2";
+            return "database-2";
         } else if (userUid >= 2000 && userUid < 3000) {
-            return "database3";
+            return "database-3";
         } else {
             throw new IllegalArgumentException("Too big userUid=" + userUid);
         }
@@ -154,11 +148,11 @@ public class Transaction {
             throw new IllegalArgumentException("Wrong userUid=" + userUid);
         }
         if (userUid >= 0 && userUid < 1000) {
-            return "database4";
+            return "database-4";
         } else if (userUid >= 1000 && userUid < 2000) {
-            return "database5";
+            return "database-5";
         } else if (userUid >= 2000 && userUid < 3000) {
-            return "database6";
+            return "database-6";
         } else {
             throw new IllegalArgumentException("Too big userUid=" + userUid);
         }

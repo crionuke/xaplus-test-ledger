@@ -1,13 +1,17 @@
-	package com.crionuke.xaplus.test.ledger;
+package org.xaplus.test.ledger;
 
-import com.crionuke.xaplus.XAPlusEngine;
-import com.crionuke.xaplus.XAPlusRestServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.xaplus.engine.XAPlusEngine;
+import org.xaplus.engine.XAPlusRestServer;
+import org.xaplus.engine.XAPlusXid;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class Controller extends Transaction {
@@ -23,12 +27,6 @@ public class Controller extends Transaction {
         this.engine = engine;
     }
 
-    @RequestMapping("/recovery")
-    public boolean recovery() throws InterruptedException {
-        engine.recovery();
-        return true;
-    }
-
     @RequestMapping("/transfer")
     public boolean transfer(@RequestParam(value="fromUserUid") int fromUserUid,
                             @RequestParam(value="toUserUid1") int toUserUid1,
@@ -37,24 +35,33 @@ public class Controller extends Transaction {
                             @RequestParam(value="count2") int count2) throws InterruptedException {
         try {
             engine.begin();
+
+            List<XAPlusXid> xids = new ArrayList<>();
+
             if (isResponsible(fromUserUid)) {
-                jdbcCredit(engine, fromUserUid, count1 + count2);
+                jdbcDebet(engine, fromUserUid, count1 + count2);
             } else {
-                callCredit(engine, fromUserUid, count1 + count2);
+                xids.add(callCredit(engine, fromUserUid, count1 + count2));
             }
 
             if (isResponsible(toUserUid1)) {
-                jdbcDebet(engine, toUserUid1, count1);
+                jdbcCredit(engine, toUserUid1, count1);
             } else {
-                callDebet(engine, toUserUid1, count1);
+                xids.add(callDebet(engine, toUserUid1, count1));
             }
 
             if (isResponsible(toUserUid2)) {
-                jdbcDebet(engine, toUserUid2, count2);
+                jdbcCredit(engine, toUserUid2, count2);
             } else {
-                callDebet(engine, toUserUid2, count2);
+                xids.add(callDebet(engine, toUserUid2, count2));
             }
-            engine.commit();
+
+            if (xids.size() == 0) {
+                engine.commit();
+            } else {
+                engine.commit(xids);
+            }
+
         } catch (Exception e) {
             logger.warn(e.getMessage());
             engine.rollback();
@@ -63,7 +70,7 @@ public class Controller extends Transaction {
     }
 
     @RequestMapping("/debet")
-    public boolean debet(@RequestParam(value="xid") String xid,
+    public boolean debet(@RequestParam(value="xid") String xidString,
                       @RequestParam(value="userUid") int userUid, @RequestParam(value="count") int count)
             throws InterruptedException {
         try {
