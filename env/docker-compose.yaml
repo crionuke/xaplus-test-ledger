@@ -1,0 +1,87 @@
+version: '3'
+
+services:
+  ledger-1:
+    image: postgres:13
+    container_name: ledger-1
+    restart: always
+    volumes:
+      - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
+      - ./ledger-1:/var/lib/postgresql/data
+    ports:
+      - "10001:5432"
+    environment:
+      - POSTGRES_PASSWORD=ledger
+      - POSTGRES_USER=ledger
+      - POSTGRES_DB=ledger
+    command: -c 'max_prepared_transactions=256'
+  ledger-2:
+    image: postgres:13
+    container_name: ledger-2
+    restart: always
+    volumes:
+      - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
+      - ./ledger-2:/var/lib/postgresql/data
+    ports:
+      - "10002:5432"
+    environment:
+      - POSTGRES_PASSWORD=ledger
+      - POSTGRES_USER=ledger
+      - POSTGRES_DB=ledger
+    command: -c 'max_prepared_transactions=256'
+  ledger-3:
+    image: postgres:13
+    container_name: ledger-3
+    restart: always
+    volumes:
+      - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
+      - ./ledger-3:/var/lib/postgresql/data
+    ports:
+      - "10003:5432"
+    environment:
+      - POSTGRES_PASSWORD=ledger
+      - POSTGRES_USER=ledger
+      - POSTGRES_DB=ledger
+    command: -c 'max_prepared_transactions=256'
+  ledger-4:
+    image: postgres:13
+    container_name: ledger-4
+    restart: always
+    volumes:
+      - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
+      - ./ledger-4:/var/lib/postgresql/data
+    ports:
+      - "10004:5432"
+    environment:
+      - POSTGRES_PASSWORD=ledger
+      - POSTGRES_USER=ledger
+      - POSTGRES_DB=ledger
+    command: -c 'max_prepared_transactions=256'
+  ledger-5:
+    image: postgres:13
+    container_name: ledger-5
+    restart: always
+    volumes:
+      - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
+      - ./ledger-5:/var/lib/postgresql/data
+    ports:
+      - "10005:5432"
+    environment:
+      - POSTGRES_PASSWORD=ledger
+      - POSTGRES_USER=ledger
+      - POSTGRES_DB=ledger
+    command: -c 'max_prepared_transactions=256'
+  ledger-6:
+    image: postgres:13
+    container_name: ledger-6
+    restart: always
+    volumes:
+      - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
+      - ./ledger-6:/var/lib/postgresql/data
+    ports:
+      - "10006:5432"
+    environment:
+      - POSTGRES_PASSWORD=ledger
+      - POSTGRES_USER=ledger
+      - POSTGRES_DB=ledger
+    command: -c 'max_prepared_transactions=256'
