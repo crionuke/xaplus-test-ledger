@@ -23,8 +23,7 @@ public class Config {
     public XAPlusEngine getXAPlusEngine(@Value("${xaplus.serverId}") String serverId,
                                         @Value("${xaplus.defaultTimeoutInSeconds}") int defaultTimeoutInSeconds) {
         XAPlus xaPlus = new XAPlus(serverId, defaultTimeoutInSeconds);
-        xaPlus.start();
-        return xaPlus.getEngine();
+        return xaPlus.start();
     }
 
     @Bean("database-1")
