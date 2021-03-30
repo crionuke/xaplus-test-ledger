@@ -74,7 +74,7 @@ public class Controller extends Transaction {
                       @RequestParam(value="userUid") int userUid, @RequestParam(value="count") int count)
             throws InterruptedException {
         try {
-            engine.join(xid);
+            engine.join(XAPlusXid.fromString(xidString));
             if (isResponsible(userUid)) {
                 jdbcDebet(engine, userUid, count);
             } else {
@@ -89,11 +89,11 @@ public class Controller extends Transaction {
     }
 
     @RequestMapping("/credit")
-    public boolean credit(@RequestParam(value="xid") String xid,
+    public boolean credit(@RequestParam(value="xid") String xidSring,
                        @RequestParam(value="userUid") int userUid, @RequestParam(value="count") int count)
             throws InterruptedException {
         try {
-            engine.join(xid);
+            engine.join(XAPlusXid.fromString(xidSring));
             if (isResponsible(userUid)) {
                 jdbcCredit(engine, userUid, count);
             } else {
