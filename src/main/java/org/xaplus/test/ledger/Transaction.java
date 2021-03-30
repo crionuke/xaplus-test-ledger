@@ -34,11 +34,11 @@ public class Transaction {
         }
         switch (serverId) {
             case "ledger-1":
-                return userUid >= 0 && userUid < 1000;
+                return userUid >= 0 && userUid < 10000;
             case "ledger-2":
-                return userUid >= 1000 && userUid < 2000;
+                return userUid >= 10000 && userUid < 20000;
             case "ledger-3":
-                return userUid >= 2000 && userUid < 3000;
+                return userUid >= 20000 && userUid < 30000;
             default:
                 throw new IllegalArgumentException("Too big userUid=" + userUid);
         }
@@ -46,30 +46,18 @@ public class Transaction {
 
     protected void jdbcCredit(XAPlusEngine engine, int userUid, int count) throws SQLException, XAException {
         logger.debug("Credit {} with {}", userUid, count);
-        String masterDatabaseName = getMasterDatabaseName(userUid);
-        Connection masterConnection = engine.enlistJdbc(masterDatabaseName);
+        Connection masterConnection = engine.enlistJdbc("database");
         PreparedStatement masterSql = masterConnection.prepareStatement(
                 "INSERT INTO ledger (l_user, l_credit) VALUES('" + userUid + "', '" + count + "');");
         masterSql.executeUpdate();
-        String slaveDatabaseName = getSlaveDatabaseName(userUid);
-        Connection slaveConnection = engine.enlistJdbc(slaveDatabaseName);
-        PreparedStatement slaveSql = slaveConnection.prepareStatement(
-                "INSERT INTO ledger (l_user, l_credit) VALUES('" + userUid + "', '" + count + "');");
-        slaveSql.executeUpdate();
     }
 
     protected void jdbcDebet(XAPlusEngine engine, int userUid, int count) throws SQLException, XAException {
         logger.debug("Debet {} with {}", userUid, count);
-        String masterDatabaseName = getMasterDatabaseName(userUid);
-        Connection masterConnection = engine.enlistJdbc(masterDatabaseName);
+        Connection masterConnection = engine.enlistJdbc("database");
         PreparedStatement masterSql = masterConnection.prepareStatement(
                 "INSERT INTO ledger (l_user, l_debet) VALUES('" + userUid + "', '" + count + "');");
         masterSql.executeUpdate();
-        String slaveDatabaseName = getSlaveDatabaseName(userUid);
-        Connection slaveConnection = engine.enlistJdbc(slaveDatabaseName);
-        PreparedStatement slaveSql = slaveConnection.prepareStatement(
-                "INSERT INTO ledger (l_user, l_debet) VALUES('" + userUid + "', '" + count + "');");
-        slaveSql.executeUpdate();
     }
 
     protected XAPlusXid callCredit(XAPlusEngine engine, int userUid, int count)
@@ -102,11 +90,11 @@ public class Transaction {
     private String getServiceLocation(int userUid) {
         if (userUid < 0) {
             throw new IllegalArgumentException("Wrong userUid=" + userUid);
-        } else if (userUid >= 0 && userUid < 1000) {
+        } else if (userUid >= 0 && userUid < 10000) {
             return "http://" + ledger1.getHostname() + ":" + ledger1.getPort();
-        } else if (userUid >= 1000 && userUid < 2000) {
+        } else if (userUid >= 10000 && userUid < 20000) {
             return "http://" + ledger2.getHostname() + ":" + ledger2.getPort();
-        } else if (userUid >= 2000 && userUid < 3000) {
+        } else if (userUid >= 20000 && userUid < 30000) {
             return "http://" + ledger3.getHostname() + ":" + ledger3.getPort();
         } else {
             throw new IllegalArgumentException("Too big userUid=" + userUid);
@@ -117,42 +105,12 @@ public class Transaction {
         if (userUid < 0) {
             throw new IllegalArgumentException("Wrong userUid=" + userUid);
         }
-        if (userUid >= 0 && userUid < 1000) {
+        if (userUid >= 0 && userUid < 10000) {
             return "ledger-1";
-        } else if (userUid >= 1000 && userUid < 2000) {
+        } else if (userUid >= 10000 && userUid < 20000) {
             return "ledger-2";
-        } else if (userUid >= 2000 && userUid < 3000) {
+        } else if (userUid >= 20000 && userUid < 30000) {
             return "ledger-3";
-        } else {
-            throw new IllegalArgumentException("Too big userUid=" + userUid);
-        }
-    }
-
-    protected String getMasterDatabaseName(int userUid) {
-        if (userUid < 0) {
-            throw new IllegalArgumentException("Wrong userUid=" + userUid);
-        }
-        if (userUid >= 0 && userUid < 1000) {
-            return "database-1";
-        } else if (userUid >= 1000 && userUid < 2000) {
-            return "database-2";
-        } else if (userUid >= 2000 && userUid < 3000) {
-            return "database-3";
-        } else {
-            throw new IllegalArgumentException("Too big userUid=" + userUid);
-        }
-    }
-
-    protected String getSlaveDatabaseName(int userUid) {
-        if (userUid < 0) {
-            throw new IllegalArgumentException("Wrong userUid=" + userUid);
-        }
-        if (userUid >= 0 && userUid < 1000) {
-            return "database-4";
-        } else if (userUid >= 1000 && userUid < 2000) {
-            return "database-5";
-        } else if (userUid >= 2000 && userUid < 3000) {
-            return "database-6";
         } else {
             throw new IllegalArgumentException("Too big userUid=" + userUid);
         }

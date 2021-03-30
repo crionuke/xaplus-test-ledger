@@ -61,7 +61,6 @@ public class Controller extends Transaction {
             } else {
                 engine.commit(xids);
             }
-
         } catch (Exception e) {
             logger.warn(e.getMessage());
             engine.rollback();

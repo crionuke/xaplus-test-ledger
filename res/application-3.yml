@@ -1,5 +1,0 @@
-xaplus:
-  serverId: "ledger-3"
-  defaultTimeoutInSeconds: 10
-server:
-  port: 8003
