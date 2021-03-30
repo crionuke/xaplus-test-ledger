@@ -67,7 +67,7 @@ public class Transaction {
         XAPlusXid xid = engine.createXAPlusXid(serviceName);
         RestTemplate restTemplate = new RestTemplate();
         String url = getServiceLocation(userUid) + "/credit?xid=" + xid + "&userUid=" + userUid + "&count=" + count;
-        restTemplate.getForObject(url, Boolean.class);
+        restTemplate.postForObject(url, null, Boolean.class);
         logger.debug("Call credit {} completed", userUid);
         return xid;
     }
@@ -79,10 +79,7 @@ public class Transaction {
         XAPlusXid xid = engine.createXAPlusXid(serviceName);
         RestTemplate restTemplate = new RestTemplate();
         String url = getServiceLocation(userUid) + "/debet?xid=" + xid + "&userUid=" + userUid + "&count=" + count;
-        boolean result = restTemplate.getForObject(url, Boolean.class);
-        if (!result) {
-            logger.warn("Credit request to {} rejected", url);
-        }
+        restTemplate.postForObject(url, null, Boolean.class);
         logger.debug("Call debet {} completed", userUid);
         return xid;
     }

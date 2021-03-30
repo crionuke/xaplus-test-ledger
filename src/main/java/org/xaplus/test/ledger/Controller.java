@@ -3,7 +3,7 @@ package org.xaplus.test.ledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.xaplus.engine.XAPlusEngine;
@@ -27,16 +27,15 @@ public class Controller extends Transaction {
         this.engine = engine;
     }
 
-    @RequestMapping("/transfer")
+    @PostMapping("/transfer")
     public boolean transfer(@RequestParam(value="fromUserUid") int fromUserUid,
                             @RequestParam(value="toUserUid1") int toUserUid1,
                             @RequestParam(value="count1") int count1,
                             @RequestParam(value="toUserUid2") int toUserUid2,
                             @RequestParam(value="count2") int count2) throws InterruptedException {
+        List<XAPlusXid> xids = new ArrayList<>();
         try {
             engine.begin();
-
-            List<XAPlusXid> xids = new ArrayList<>();
 
             if (isResponsible(fromUserUid)) {
                 jdbcDebet(engine, fromUserUid, count1 + count2);
@@ -56,19 +55,15 @@ public class Controller extends Transaction {
                 xids.add(callDebet(engine, toUserUid2, count2));
             }
 
-            if (xids.size() == 0) {
-                engine.commit();
-            } else {
-                engine.commit(xids);
-            }
+            engine.commit(xids);
         } catch (Exception e) {
             logger.warn(e.getMessage());
-            engine.rollback();
+            engine.rollback(xids);
         }
         return true;
     }
 
-    @RequestMapping("/debet")
+    @PostMapping("/debet")
     public boolean debet(@RequestParam(value="xid") String xidString,
                       @RequestParam(value="userUid") int userUid, @RequestParam(value="count") int count)
             throws InterruptedException {
@@ -87,7 +82,7 @@ public class Controller extends Transaction {
         return true;
     }
 
-    @RequestMapping("/credit")
+    @PostMapping("/credit")
     public boolean credit(@RequestParam(value="xid") String xidSring,
                        @RequestParam(value="userUid") int userUid, @RequestParam(value="count") int count)
             throws InterruptedException {

@@ -34,6 +34,7 @@ public class Config {
         org.apache.tomcat.jdbc.pool.XADataSource xaDataSource = new org.apache.tomcat.jdbc.pool.XADataSource();
         xaDataSource.setDataSource(pgxaDataSource);
         engine.register(xaDataSource, "database");
+        engine.setTLogDataSource(xaDataSource);
         return xaDataSource;
     }
 
