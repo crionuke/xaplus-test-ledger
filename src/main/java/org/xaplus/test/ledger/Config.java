@@ -21,7 +21,7 @@ public class Config {
 
     @Bean
     public XAPlusEngine getXAPlusEngine(XAPlus xaPlus) {
-        return xaPlus.start();
+        return xaPlus.construct();
     }
 
     @Bean
