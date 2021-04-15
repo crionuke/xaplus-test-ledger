@@ -15,8 +15,9 @@ public class Config {
 
     @Bean
     public XAPlus getXAPlus(@Value("${xaplus.serverId}") String serverId,
-                            @Value("${xaplus.defaultTimeoutInSeconds}") int defaultTimeoutInSeconds) {
-        return new XAPlus(serverId, defaultTimeoutInSeconds);
+                            @Value("${xaplus.transactionsTimeoutInSeconds}") int transactionsTimeoutInSeconds,
+                            @Value("${xaplus.recoveryTimeoutInSeconds}") int recoveryTimeoutInSeconds) {
+        return new XAPlus(serverId, transactionsTimeoutInSeconds, recoveryTimeoutInSeconds);
     }
 
     @Bean

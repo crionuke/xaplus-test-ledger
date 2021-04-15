@@ -64,7 +64,7 @@ public class Transaction {
             throws XAException, RestClientException {
         logger.debug("CALL credit {} with {}", userUid, count);
         String serviceName = getServiceName(userUid);
-        XAPlusXid xid = engine.createXAPlusXid(serviceName);
+        XAPlusXid xid = engine.enlistXAPlus(serviceName);
         RestTemplate restTemplate = new RestTemplate();
         String url = getServiceLocation(userUid) + "/credit?xid=" + xid + "&userUid=" + userUid + "&count=" + count;
         restTemplate.postForObject(url, null, Boolean.class);
@@ -76,7 +76,7 @@ public class Transaction {
             throws XAException, RestClientException {
         logger.debug("Call debet {} with {}", userUid, count);
         String serviceName = getServiceName(userUid);
-        XAPlusXid xid = engine.createXAPlusXid(serviceName);
+        XAPlusXid xid = engine.enlistXAPlus(serviceName);
         RestTemplate restTemplate = new RestTemplate();
         String url = getServiceLocation(userUid) + "/debet?xid=" + xid + "&userUid=" + userUid + "&count=" + count;
         restTemplate.postForObject(url, null, Boolean.class);

@@ -33,32 +33,31 @@ public class Controller extends Transaction {
                             @RequestParam(value="count1") int count1,
                             @RequestParam(value="toUserUid2") int toUserUid2,
                             @RequestParam(value="count2") int count2) throws InterruptedException {
-        List<XAPlusXid> xids = new ArrayList<>();
         try {
             engine.begin();
 
             if (isResponsible(fromUserUid)) {
                 jdbcDebet(engine, fromUserUid, count1 + count2);
             } else {
-                xids.add(callCredit(engine, fromUserUid, count1 + count2));
+                callCredit(engine, fromUserUid, count1 + count2);
             }
 
             if (isResponsible(toUserUid1)) {
                 jdbcCredit(engine, toUserUid1, count1);
             } else {
-                xids.add(callDebet(engine, toUserUid1, count1));
+                callDebet(engine, toUserUid1, count1);
             }
 
             if (isResponsible(toUserUid2)) {
                 jdbcCredit(engine, toUserUid2, count2);
             } else {
-                xids.add(callDebet(engine, toUserUid2, count2));
+                callDebet(engine, toUserUid2, count2);
             }
 
-            engine.commit(xids);
+            engine.commit();
         } catch (Exception e) {
             logger.warn(e.getMessage());
-            engine.rollback(xids);
+            engine.rollback();
         }
         return true;
     }
