@@ -2,6 +2,7 @@ xaplus:
   serverId: "ledger-2"
   transactionsTimeoutInSeconds: 10
   recoveryTimeoutInSeconds: 30
+  recoveryPeriodInSeconds: 30
 server:
   port: 8002
 db:
