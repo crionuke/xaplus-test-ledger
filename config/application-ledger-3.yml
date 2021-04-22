@@ -6,6 +6,6 @@ xaplus:
 server:
   port: 8003
 db:
-  url: jdbc:postgresql://127.0.0.1:10003/ledger
+  url: jdbc:postgresql://127.0.0.1:20003/ledger
   user: ledger
   password: ledger

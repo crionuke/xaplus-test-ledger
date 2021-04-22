@@ -9,7 +9,7 @@ services:
       - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
       - ./ledger-1:/var/lib/postgresql/data
     ports:
-      - "10001:5432"
+      - "20001:5432"
     environment:
       - POSTGRES_PASSWORD=ledger
       - POSTGRES_USER=ledger
@@ -23,7 +23,7 @@ services:
       - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
       - ./ledger-2:/var/lib/postgresql/data
     ports:
-      - "10002:5432"
+      - "20002:5432"
     environment:
       - POSTGRES_PASSWORD=ledger
       - POSTGRES_USER=ledger
@@ -37,7 +37,7 @@ services:
       - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
       - ./ledger-3:/var/lib/postgresql/data
     ports:
-      - "10003:5432"
+      - "20003:5432"
     environment:
       - POSTGRES_PASSWORD=ledger
       - POSTGRES_USER=ledger

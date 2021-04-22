@@ -10,9 +10,6 @@ import org.xaplus.engine.XAPlusEngine;
 import org.xaplus.engine.XAPlusRestServer;
 import org.xaplus.engine.XAPlusXid;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @RestController
 public class Controller extends Transaction {
     static private final Logger logger = LoggerFactory.getLogger(Controller.class);
@@ -28,75 +25,75 @@ public class Controller extends Transaction {
     }
 
     @PostMapping("/transfer")
-    public boolean transfer(@RequestParam(value="fromUserUid") int fromUserUid,
-                            @RequestParam(value="toUserUid1") int toUserUid1,
-                            @RequestParam(value="count1") int count1,
-                            @RequestParam(value="toUserUid2") int toUserUid2,
-                            @RequestParam(value="count2") int count2) throws InterruptedException {
+    public boolean transfer(@RequestParam(value = "rqUid") int rqUid,
+                            @RequestParam(value = "fromUser") int fromUser,
+                            @RequestParam(value = "toUser") int toUser,
+                            @RequestParam(value = "count") int count) throws InterruptedException {
         try {
             engine.begin();
 
-            if (isResponsible(fromUserUid)) {
-                jdbcDebet(engine, fromUserUid, count1 + count2);
+            if (isResponsible(fromUser)) {
+                jdbcCredit(engine, rqUid, fromUser, count);
             } else {
-                callCredit(engine, fromUserUid, count1 + count2);
+                callCredit(engine, rqUid, fromUser, count);
             }
 
-            if (isResponsible(toUserUid1)) {
-                jdbcCredit(engine, toUserUid1, count1);
+            if (isResponsible(toUser)) {
+                jdbcDebet(engine, rqUid, toUser, count);
             } else {
-                callDebet(engine, toUserUid1, count1);
-            }
-
-            if (isResponsible(toUserUid2)) {
-                jdbcCredit(engine, toUserUid2, count2);
-            } else {
-                callDebet(engine, toUserUid2, count2);
+                callDebet(engine, rqUid, toUser, count);
             }
 
             engine.commit();
+            return true;
         } catch (Exception e) {
             logger.warn(e.getMessage());
             engine.rollback();
+            return false;
         }
-        return true;
     }
 
     @PostMapping("/debet")
-    public boolean debet(@RequestParam(value="xid") String xidString,
-                      @RequestParam(value="userUid") int userUid, @RequestParam(value="count") int count)
+    public boolean debet(@RequestParam(value = "xid") String xidString,
+                         @RequestParam(value = "rqUid") int rqUid,
+                         @RequestParam(value = "toUser") int toUser,
+                         @RequestParam(value = "count") int count)
             throws InterruptedException {
         try {
             engine.join(XAPlusXid.fromString(xidString));
-            if (isResponsible(userUid)) {
-                jdbcDebet(engine, userUid, count);
+            if (isResponsible(toUser)) {
+                jdbcDebet(engine, rqUid, toUser, count);
             } else {
-                throw new IllegalStateException(serverId + " not fit for userUid=" + userUid);
+                throw new IllegalStateException(serverId + " not fit for user=" + toUser);
             }
             engine.commit();
+            return true;
         } catch (Exception e) {
             logger.warn(e.getMessage());
             engine.rollback();
+            return false;
         }
-        return true;
     }
 
     @PostMapping("/credit")
-    public boolean credit(@RequestParam(value="xid") String xidSring,
-                       @RequestParam(value="userUid") int userUid, @RequestParam(value="count") int count)
+    public boolean credit(@RequestParam(value = "xid") String xidSring,
+                          @RequestParam(value = "rqUid") int rqUid,
+                          @RequestParam(value = "fromUser") int fromUser,
+                          @RequestParam(value = "count") int count)
             throws InterruptedException {
         try {
             engine.join(XAPlusXid.fromString(xidSring));
-            if (isResponsible(userUid)) {
-                jdbcCredit(engine, userUid, count);
+            if (isResponsible(fromUser)) {
+                jdbcCredit(engine, rqUid, fromUser, count);
             } else {
-                throw new IllegalStateException(serverId + " not fit for userUid=" + userUid);
+                throw new IllegalStateException(serverId + " not fit for user=" + fromUser);
             }
             engine.commit();
+            return true;
         } catch (Exception e) {
             logger.warn(e.getMessage());
             engine.rollback();
+            return false;
         }
-        return true;
     }
 }

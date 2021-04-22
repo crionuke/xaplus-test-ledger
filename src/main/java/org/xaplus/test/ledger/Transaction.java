@@ -16,6 +16,9 @@ import java.sql.SQLException;
 public class Transaction {
     static private final Logger logger = LoggerFactory.getLogger(Transaction.class);
 
+    static private final String INSERT_CREDIT = "INSERT INTO ledger (l_rq_uid, l_user, l_credit) VALUES(?, ?, ?)";
+    static private final String INSERT_DEBET = "INSERT INTO ledger (l_rq_uid, l_user, l_debet) VALUES(?, ?, ?)";
+
     protected final String serverId;
     protected final XAPlusRestServer ledger1;
     protected final XAPlusRestServer ledger2;
@@ -28,63 +31,69 @@ public class Transaction {
         this.ledger3 = ledger3;
     }
 
-    protected boolean isResponsible(int userUid) {
-        if (userUid < 0) {
-            throw new IllegalArgumentException("Wrong userUid=" + userUid);
+    protected void jdbcCredit(XAPlusEngine engine, long rqUid, long fromUser, long count)
+            throws SQLException, XAException {
+        logger.debug("Credit from {} with {}, rqUid={}", fromUser, count, rqUid);
+        Connection connection = engine.enlistJdbc("database");
+        PreparedStatement statement = connection.prepareStatement(INSERT_CREDIT);
+        statement.setLong(1, rqUid);
+        statement.setLong(2, fromUser);
+        statement.setLong(3, count);
+        statement.executeUpdate();
+    }
+
+    protected void jdbcDebet(XAPlusEngine engine, long rqUid, long toUser, long count)
+            throws SQLException, XAException {
+        logger.debug("Debet to {} with {}, rqUid={}", toUser, count, rqUid);
+        Connection connection = engine.enlistJdbc("database");
+        PreparedStatement statement = connection.prepareStatement(INSERT_DEBET);
+        statement.setLong(1, rqUid);
+        statement.setLong(2, toUser);
+        statement.setLong(3, count);
+        statement.executeUpdate();
+    }
+
+    protected XAPlusXid callCredit(XAPlusEngine engine, long rqUid, long fromUser, long count)
+            throws XAException, RestClientException {
+        logger.debug("CALL credit {} with {}, rqUid={}", fromUser, count, rqUid);
+        String serviceName = getServiceName(fromUser);
+        XAPlusXid xid = engine.enlistXAPlus(serviceName);
+        RestTemplate restTemplate = new RestTemplate();
+        String url = getServiceLocation(fromUser) + "/credit" +
+                "?xid=" + xid + "&rqUid=" + rqUid + "&fromUser=" + fromUser + "&count=" + count;
+        restTemplate.postForObject(url, null, Boolean.class);
+        return xid;
+    }
+
+    protected XAPlusXid callDebet(XAPlusEngine engine, long rqUid, long toUser, long count)
+            throws XAException, RestClientException {
+        logger.debug("Call debet {} with {}, rqUid={}", toUser, count, rqUid);
+        String serviceName = getServiceName(toUser);
+        XAPlusXid xid = engine.enlistXAPlus(serviceName);
+        RestTemplate restTemplate = new RestTemplate();
+        String url = getServiceLocation(toUser) + "/debet" +
+                "?xid=" + xid + "&rqUid=" + rqUid + "&toUser=" + toUser + "&count=" + count;
+        restTemplate.postForObject(url, null, Boolean.class);
+        return xid;
+    }
+
+    protected boolean isResponsible(long user) {
+        if (user < 0) {
+            throw new IllegalArgumentException("Wrong user=" + user);
         }
         switch (serverId) {
             case "ledger-1":
-                return userUid >= 0 && userUid < 10000;
+                return user >= 0 && user < 10000;
             case "ledger-2":
-                return userUid >= 10000 && userUid < 20000;
+                return user >= 10000 && user < 20000;
             case "ledger-3":
-                return userUid >= 20000 && userUid < 30000;
+                return user >= 20000 && user < 30000;
             default:
-                throw new IllegalArgumentException("Too big userUid=" + userUid);
+                throw new IllegalArgumentException("Too big user=" + user);
         }
     }
 
-    protected void jdbcCredit(XAPlusEngine engine, int userUid, int count) throws SQLException, XAException {
-        logger.debug("Credit {} with {}", userUid, count);
-        Connection masterConnection = engine.enlistJdbc("database");
-        PreparedStatement masterSql = masterConnection.prepareStatement(
-                "INSERT INTO ledger (l_user, l_credit) VALUES('" + userUid + "', '" + count + "');");
-        masterSql.executeUpdate();
-    }
-
-    protected void jdbcDebet(XAPlusEngine engine, int userUid, int count) throws SQLException, XAException {
-        logger.debug("Debet {} with {}", userUid, count);
-        Connection masterConnection = engine.enlistJdbc("database");
-        PreparedStatement masterSql = masterConnection.prepareStatement(
-                "INSERT INTO ledger (l_user, l_debet) VALUES('" + userUid + "', '" + count + "');");
-        masterSql.executeUpdate();
-    }
-
-    protected XAPlusXid callCredit(XAPlusEngine engine, int userUid, int count)
-            throws XAException, RestClientException {
-        logger.debug("CALL credit {} with {}", userUid, count);
-        String serviceName = getServiceName(userUid);
-        XAPlusXid xid = engine.enlistXAPlus(serviceName);
-        RestTemplate restTemplate = new RestTemplate();
-        String url = getServiceLocation(userUid) + "/credit?xid=" + xid + "&userUid=" + userUid + "&count=" + count;
-        restTemplate.postForObject(url, null, Boolean.class);
-        logger.debug("Call credit {} completed", userUid);
-        return xid;
-    }
-
-    protected XAPlusXid callDebet(XAPlusEngine engine, int userUid, int count)
-            throws XAException, RestClientException {
-        logger.debug("Call debet {} with {}", userUid, count);
-        String serviceName = getServiceName(userUid);
-        XAPlusXid xid = engine.enlistXAPlus(serviceName);
-        RestTemplate restTemplate = new RestTemplate();
-        String url = getServiceLocation(userUid) + "/debet?xid=" + xid + "&userUid=" + userUid + "&count=" + count;
-        restTemplate.postForObject(url, null, Boolean.class);
-        logger.debug("Call debet {} completed", userUid);
-        return xid;
-    }
-
-    private String getServiceLocation(int userUid) {
+    private String getServiceLocation(long userUid) {
         if (userUid < 0) {
             throw new IllegalArgumentException("Wrong userUid=" + userUid);
         } else if (userUid >= 0 && userUid < 10000) {
@@ -98,7 +107,7 @@ public class Transaction {
         }
     }
 
-    private String getServiceName(int userUid) {
+    private String getServiceName(long userUid) {
         if (userUid < 0) {
             throw new IllegalArgumentException("Wrong userUid=" + userUid);
         }

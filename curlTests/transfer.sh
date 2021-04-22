@@ -1,3 +1,3 @@
 #!/bin/bash
 
-curl -v -X POST "localhost:8001/transfer?fromUserUid=0&toUserUid1=10000&count1=100&toUserUid2=20000&count2=200"
+curl -v -X POST "localhost:8001/transfer?rqUid=1&fromUser=0&toUser=10000&count=100"
