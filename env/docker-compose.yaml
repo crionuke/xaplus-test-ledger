@@ -1,45 +1,68 @@
 version: '3'
 
 services:
-  ledger-1:
+  ledger-1-app:
+    image: xaplus-test-ledger:1.0.0
+    container_name: ledger-1-app
+    ports:
+      - "10001:10001"
+    volumes:
+      - ./ledger-1-app.yml:/opt/config/application.yml
+  ledger-1-db:
     image: postgres:13
-    container_name: ledger-1
+    container_name: ledger-1-db
     restart: always
     volumes:
       - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
-      - ./ledger-1:/var/lib/postgresql/data
+      - ./volumes/ledger-1-db:/var/lib/postgresql/data
     ports:
-      - "20001:5432"
+      - "20001:20001"
     environment:
       - POSTGRES_PASSWORD=ledger
       - POSTGRES_USER=ledger
       - POSTGRES_DB=ledger
-    command: -c 'max_prepared_transactions=256'
-  ledger-2:
+    command: -c 'port=20001' -c 'max_prepared_transactions=512'
+
+  ledger-2-app:
+    image: xaplus-test-ledger:1.0.0
+    container_name: ledger-2-app
+    ports:
+      - "10002:10002"
+    volumes:
+      - ./ledger-2-app.yml:/opt/config/application.yml
+  ledger-2-db:
     image: postgres:13
-    container_name: ledger-2
+    container_name: ledger-2-db
     restart: always
     volumes:
       - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
-      - ./ledger-2:/var/lib/postgresql/data
+      - ./volumes/ledger-2-db:/var/lib/postgresql/data
     ports:
-      - "20002:5432"
+      - "20002:20002"
     environment:
       - POSTGRES_PASSWORD=ledger
       - POSTGRES_USER=ledger
       - POSTGRES_DB=ledger
-    command: -c 'max_prepared_transactions=256'
-  ledger-3:
+    command: -c 'port=20002' -c 'max_prepared_transactions=512'
+
+  ledger-3-app:
+    image: xaplus-test-ledger:1.0.0
+    container_name: ledger-3-app
+    ports:
+      - "10003:10003"
+    volumes:
+      - ./ledger-3-app.yml:/opt/config/application.yml
+  ledger-3-db:
     image: postgres:13
-    container_name: ledger-3
+    container_name: ledger-3-db
     restart: always
     volumes:
       - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
-      - ./ledger-3:/var/lib/postgresql/data
+      - ./volumes/ledger-3-db:/var/lib/postgresql/data
     ports:
-      - "20003:5432"
+      - "20003:20003"
     environment:
       - POSTGRES_PASSWORD=ledger
       - POSTGRES_USER=ledger
       - POSTGRES_DB=ledger
-    command: -c 'max_prepared_transactions=256'
+    command: -c 'port=20003' -c 'max_prepared_transactions=512'
