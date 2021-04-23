@@ -41,22 +41,25 @@ public class Config {
     }
 
     @Bean("ledger-1")
-    public XAPlusRestServer getLedger1(XAPlusEngine engine) {
-        XAPlusRestServer xaPlusRestServer = new XAPlusRestServer("127.0.0.1", 8001);
+    public XAPlusRestServer getLedger1(XAPlusEngine engine, @Value("${ledger-1.hostname}") String hostname,
+                                       @Value("${ledger-1.port}") int port) {
+        XAPlusRestServer xaPlusRestServer = new XAPlusRestServer(hostname, port);
         engine.register(xaPlusRestServer, "ledger-1");
         return xaPlusRestServer;
     }
 
     @Bean("ledger-2")
-    public XAPlusRestServer getLedger2(XAPlusEngine engine) {
-        XAPlusRestServer xaPlusRestServer = new XAPlusRestServer("127.0.0.1", 8002);
+    public XAPlusRestServer getLedger2(XAPlusEngine engine, @Value("${ledger-2.hostname}") String hostname,
+                                       @Value("${ledger-2.port}") int port) {
+        XAPlusRestServer xaPlusRestServer = new XAPlusRestServer(hostname, port);
         engine.register(xaPlusRestServer, "ledger-2");
         return xaPlusRestServer;
     }
 
     @Bean("ledger-3")
-    public XAPlusRestServer getLedger3(XAPlusEngine engine) {
-        XAPlusRestServer xaPlusRestServer = new XAPlusRestServer("127.0.0.1", 8003);
+    public XAPlusRestServer getLedger3(XAPlusEngine engine, @Value("${ledger-3.hostname}") String hostname,
+                                       @Value("${ledger-3.port}") int port) {
+        XAPlusRestServer xaPlusRestServer = new XAPlusRestServer(hostname, port);
         engine.register(xaPlusRestServer, "ledger-3");
         return xaPlusRestServer;
     }
