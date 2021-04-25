@@ -83,11 +83,11 @@ public class Transaction {
         }
         switch (serverId) {
             case "ledger-1":
-                return user >= 0 && user < 10000;
+                return user >= 0 && user < 1000;
             case "ledger-2":
-                return user >= 10000 && user < 20000;
+                return user >= 1000 && user < 2000;
             case "ledger-3":
-                return user >= 20000 && user < 30000;
+                return user >= 2000 && user < 3000;
             default:
                 throw new IllegalArgumentException("Too big user=" + user);
         }
@@ -96,11 +96,11 @@ public class Transaction {
     private String getServiceLocation(long userUid) {
         if (userUid < 0) {
             throw new IllegalArgumentException("Wrong userUid=" + userUid);
-        } else if (userUid >= 0 && userUid < 10000) {
+        } else if (userUid >= 0 && userUid < 1000) {
             return "http://" + ledger1.getHostname() + ":" + ledger1.getPort();
-        } else if (userUid >= 10000 && userUid < 20000) {
+        } else if (userUid >= 1000 && userUid < 2000) {
             return "http://" + ledger2.getHostname() + ":" + ledger2.getPort();
-        } else if (userUid >= 20000 && userUid < 30000) {
+        } else if (userUid >= 2000 && userUid < 3000) {
             return "http://" + ledger3.getHostname() + ":" + ledger3.getPort();
         } else {
             throw new IllegalArgumentException("Too big userUid=" + userUid);
@@ -111,11 +111,11 @@ public class Transaction {
         if (userUid < 0) {
             throw new IllegalArgumentException("Wrong userUid=" + userUid);
         }
-        if (userUid >= 0 && userUid < 10000) {
+        if (userUid >= 0 && userUid < 1000) {
             return "ledger-1";
-        } else if (userUid >= 10000 && userUid < 20000) {
+        } else if (userUid >= 1000 && userUid < 2000) {
             return "ledger-2";
-        } else if (userUid >= 20000 && userUid < 30000) {
+        } else if (userUid >= 2000 && userUid < 3000) {
             return "ledger-3";
         } else {
             throw new IllegalArgumentException("Too big userUid=" + userUid);
