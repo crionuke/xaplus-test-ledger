@@ -15,10 +15,9 @@ while :; do
     COUNT=$((1+$RANDOM%1000))
 
     if [[ ${FROM_USER} -ne ${TO_USER} ]]; then
-        CMD="curl -X POST http://localhost:${PORT}/transfer?rqUid=${RQ_UID}&fromUser=${FROM_USER}&toUser=${TO_USER}&count=${COUNT}"
-        echo
-        echo ${CMD}
-        ${CMD}
+        CMD="curl -s -X POST http://localhost:${PORT}/transfer?rqUid=${RQ_UID}&fromUser=${FROM_USER}&toUser=${TO_USER}&count=${COUNT}"
+        RESULT=$(${CMD})
+        echo ${CMD}, ${RESULT}
         sleep ${DELAY}
 
         RQ_UID=$((RQ_UID+1))
