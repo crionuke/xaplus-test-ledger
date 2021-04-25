@@ -1,9 +1,8 @@
 #!/bin/bash
 
 docker-compose kill
+docker-compose rm -f
 
-rm -rf ledger-1
-rm -rf ledger-2
-rm -rf ledger-3
+rm -rf volumes
 
 docker-compose up -d
