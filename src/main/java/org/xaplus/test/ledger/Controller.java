@@ -29,6 +29,9 @@ public class Controller extends Transaction {
                             @RequestParam(value = "fromUser") int fromUser,
                             @RequestParam(value = "toUser") int toUser,
                             @RequestParam(value = "count") int count) throws InterruptedException {
+        if (logger.isInfoEnabled()) {
+            logger.info("Transfer rqUid={}, fromUser={}, toUser={}, count={}", rqUid, fromUser, toUser, count);
+        }
         try {
             engine.begin();
 
@@ -59,6 +62,9 @@ public class Controller extends Transaction {
                          @RequestParam(value = "toUser") int toUser,
                          @RequestParam(value = "count") int count)
             throws InterruptedException {
+        if (logger.isInfoEnabled()) {
+            logger.info("Transfer rqUid={}, toUser={}, count={}, xid={}", rqUid, toUser, count, xidString);
+        }
         try {
             engine.join(XAPlusXid.fromString(xidString));
             if (isResponsible(toUser)) {
@@ -76,13 +82,16 @@ public class Controller extends Transaction {
     }
 
     @PostMapping("/credit")
-    public boolean credit(@RequestParam(value = "xid") String xidSring,
+    public boolean credit(@RequestParam(value = "xid") String xidString,
                           @RequestParam(value = "rqUid") int rqUid,
                           @RequestParam(value = "fromUser") int fromUser,
                           @RequestParam(value = "count") int count)
             throws InterruptedException {
+        if (logger.isInfoEnabled()) {
+            logger.info("Credit rqUid={}, fromUser={}, count={}, xid={}", rqUid, fromUser, count, xidString);
+        }
         try {
-            engine.join(XAPlusXid.fromString(xidSring));
+            engine.join(XAPlusXid.fromString(xidString));
             if (isResponsible(fromUser)) {
                 jdbcCredit(engine, rqUid, fromUser, count);
             } else {

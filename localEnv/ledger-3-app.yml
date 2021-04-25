@@ -1,5 +1,6 @@
 logging:
   level:
+    org.xaplus.test.ledger: INFO
     com.crionuke.bolts: WARN
     org.xaplus.engine: INFO
 xaplus:
