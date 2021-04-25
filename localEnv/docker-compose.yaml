@@ -4,7 +4,6 @@ services:
   ledger-1-app:
     image: xaplus-test-ledger:1.0.0
     container_name: ledger-1-app
-    restart: always
     ports:
       - "10001:10001"
     volumes:
@@ -12,7 +11,6 @@ services:
   ledger-1-db:
     image: postgres:13
     container_name: ledger-1-db
-    restart: always
     volumes:
       - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
       - ./volumes/ledger-1-db:/var/lib/postgresql/data
@@ -27,7 +25,6 @@ services:
   ledger-2-app:
     image: xaplus-test-ledger:1.0.0
     container_name: ledger-2-app
-    restart: always
     ports:
       - "10002:10002"
     volumes:
@@ -35,7 +32,6 @@ services:
   ledger-2-db:
     image: postgres:13
     container_name: ledger-2-db
-    restart: always
     volumes:
       - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
       - ./volumes/ledger-2-db:/var/lib/postgresql/data
@@ -50,7 +46,6 @@ services:
   ledger-3-app:
     image: xaplus-test-ledger:1.0.0
     container_name: ledger-3-app
-    restart: always
     ports:
       - "10003:10003"
     volumes:
@@ -58,7 +53,6 @@ services:
   ledger-3-db:
     image: postgres:13
     container_name: ledger-3-db
-    restart: always
     volumes:
       - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql
       - ./volumes/ledger-3-db:/var/lib/postgresql/data
