@@ -4,6 +4,7 @@ services:
   ledger-1-app:
     image: xaplus-test-ledger:1.0.0
     container_name: ledger-1-app
+    restart: always
     ports:
       - "10001:10001"
     volumes:
@@ -26,6 +27,7 @@ services:
   ledger-2-app:
     image: xaplus-test-ledger:1.0.0
     container_name: ledger-2-app
+    restart: always
     ports:
       - "10002:10002"
     volumes:
@@ -48,6 +50,7 @@ services:
   ledger-3-app:
     image: xaplus-test-ledger:1.0.0
     container_name: ledger-3-app
+    restart: always
     ports:
       - "10003:10003"
     volumes:

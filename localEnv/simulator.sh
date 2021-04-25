@@ -12,6 +12,4 @@ while :; do
     sleep ${DELAY}
     docker-compose up -d ${SERVICE}
     sleep ${DELAY}
-
-    STEP=$((STEP+1))
 done
