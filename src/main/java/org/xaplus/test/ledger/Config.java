@@ -35,6 +35,10 @@ public class Config {
         pgxaDataSource.setUrl(url);
         org.apache.tomcat.jdbc.pool.XADataSource xaDataSource = new org.apache.tomcat.jdbc.pool.XADataSource();
         xaDataSource.setDataSource(pgxaDataSource);
+        xaDataSource.setValidationQuery("SELECT 1");
+        xaDataSource.setValidationQueryTimeout(1000);
+        xaDataSource.setTestOnBorrow(true);
+        xaDataSource.setRemoveAbandoned(true);
         engine.register(xaDataSource, "database");
         engine.setTLogDataSource(xaDataSource);
         return xaDataSource;
