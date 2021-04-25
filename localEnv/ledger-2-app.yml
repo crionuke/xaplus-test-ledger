@@ -1,3 +1,7 @@
+logging:
+  level:
+    com.crionuke.bolts: WARN
+    org.xaplus.engine: INFO
 xaplus:
   serverId: "ledger-2"
   transactionsTimeoutInSeconds: 10
